@@ -1,0 +1,29 @@
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     maestro.empresa.local. root.empresa.local. (
+                     2026090504         ; Serial
+                          86400         ; Refresh
+                           7200         ; Retry
+                        2419200         ; Expire
+                           3600 )       ; Negative Cache TTL
+;
+@       IN      NS      maestro.empresa.local.
+@	IN	NS	esclavo.empresa.local.
+@ 	IN 	MX 10	mail.empresa.local.
+
+maestro IN      A       192.168.50.3
+esclavo IN 	A	192.168.50.2
+ns1     IN      A       192.168.50.3
+ns2     IN      A       192.168.50.2
+www     IN      A       192.168.50.3
+mail    IN      A       192.168.50.3
+
+ns1     IN      AAAA    fd00::3
+ns2     IN      AAAA    fd00::2
+www     IN      AAAA    fd00::3
+mail    IN      AAAA    fd00::3
+
+ejemplo IN 	CNAME	ns1
+parcial IN 	CNAME 	ns1
