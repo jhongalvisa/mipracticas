@@ -1,0 +1,46 @@
+/*             PARCIAL          */
+
+
+/*Zona inversa Parcial*/
+zone "50.168.192.in-addr.arpa" {
+type master;
+file "/etc/bind/db.192parcial";
+notify yes;
+allow-transfer { key "clave-parcial"; };
+};
+
+/* Zona Directa del Parcial */
+zone "empresa.local" {
+type master;
+file "/etc/bind/db.empresa.local";
+notify yes;
+allow-transfer { key "clave-parcial"; };
+};
+
+logging {
+    channel queries_file {
+        file "/var/log/named/queries.log" versions 3 size 5m;
+        severity info;
+        print-time yes;
+        print-category yes;
+    };
+
+    channel transfers_file {
+        file "/var/log/named/transfers.log" versions 3 size 5m;
+        severity info;
+        print-time yes;
+        print-category yes;
+    };
+
+    channel security_file {
+        file "/var/log/named/security.log" versions 3 size 5m;
+        severity info;
+        print-time yes;
+        print-category yes;
+    };
+
+    category queries { queries_file; };
+    category xfer-out { transfers_file; };
+    category xfer-in { transfers_file; };
+    category security { security_file; };
+};
