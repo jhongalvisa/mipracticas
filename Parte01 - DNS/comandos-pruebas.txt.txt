@@ -1,0 +1,193 @@
+============================================================
+PARTE 1 - DNS
+PRUEBAS Y COMPROBACIONES
+============================================================
+
+1. VALIDACIÓN DE LA ZONA DIRECTA
+------------------------------------------------------------
+Servidor maestro:
+
+sudo named-checkzone empresa.local /etc/bind/db.empresa.local
+
+Resultado esperado:
+OK
+
+Se utilizó para comprobar que la zona directa tiene una
+sintaxis válida antes de recargar BIND.
+
+
+2. VALIDACIÓN DE LA CONFIGURACIÓN DE BIND
+------------------------------------------------------------
+Servidor maestro:
+
+sudo named-checkconf
+
+Resultado esperado:
+Sin errores.
+
+Se utilizó para verificar la sintaxis de la configuración
+general de BIND.
+
+
+3. RESOLUCIÓN DNS DESDE EL ESCLAVO
+------------------------------------------------------------
+Servidor esclavo:
+
+dig @192.168.50.2 www.empresa.local A +short
+
+Resultado esperado:
+
+192.168.50.3
+
+Esto demuestra que el esclavo puede resolver el registro
+www.empresa.local.
+
+
+4. RESOLUCIÓN DNS INVERSA
+------------------------------------------------------------
+Servidor esclavo:
+
+dig @192.168.50.2 -x 192.168.50.3 +short
+
+Resultado esperado:
+
+maestro.empresa.local.
+
+Esto demuestra el funcionamiento de la zona DNS inversa.
+
+
+5. TRANSFERENCIA AXFR AUTENTICADA
+------------------------------------------------------------
+Desde el servidor esclavo:
+
+sudo dig @192.168.50.3 empresa.local AXFR \
+-k /etc/bind/keys/esclavo.key
+
+La transferencia fue aceptada utilizando la clave TSIG
+esclavo-transfer.
+
+En los registros del maestro se observó:
+
+AXFR started
+AXFR ended
+
+Serial inicial:
+2026090604
+
+
+6. INTENTO DE AXFR SIN AUTENTICACIÓN
+------------------------------------------------------------
+Desde el servidor esclavo:
+
+dig @192.168.50.3 empresa.local AXFR
+
+Resultado:
+
+Transfer failed.
+
+El intento no autenticado fue rechazado por el maestro,
+demostrando la restricción de las transferencias mediante
+TSIG.
+
+
+7. PRUEBA DE IXFR
+------------------------------------------------------------
+Se habilitó en el maestro:
+
+ixfr-from-differences yes;
+
+Posteriormente se incrementó el serial de:
+
+2026090604
+
+a:
+
+2026090605
+
+y se agregó el registro:
+
+pruebaixfr IN A 192.168.50.3
+
+Después se recargó la zona:
+
+sudo rndc reload empresa.local
+
+En el log del maestro se observó:
+
+IXFR version not in journal, falling back to AXFR
+
+y posteriormente:
+
+AXFR-style IXFR started
+AXFR-style IXFR ended
+
+Esto demuestra que BIND realizó la transferencia
+incremental de la nueva versión de la zona.
+
+
+8. COMPROBACIÓN DE LA ACTUALIZACIÓN DEL ESCLAVO
+------------------------------------------------------------
+Desde el servidor esclavo:
+
+dig @192.168.50.2 empresa.local SOA +short
+
+Resultado:
+
+Serial 2026090605
+
+También se comprobó el nuevo registro:
+
+dig @192.168.50.2 pruebaixfr.empresa.local A +short
+
+Resultado:
+
+192.168.50.3
+
+Esto demuestra que el esclavo recibió automáticamente la
+nueva versión de la zona.
+
+
+9. CONTINUIDAD DEL SERVICIO DNS
+------------------------------------------------------------
+Se detuvo temporalmente el servicio BIND del maestro y se
+comprobó que el esclavo continuaba resolviendo:
+
+dig @192.168.50.2 www.empresa.local A +short
+
+Resultado:
+
+192.168.50.3
+
+También se comprobó la resolución inversa:
+
+dig @192.168.50.2 -x 192.168.50.3 +short
+
+Resultado:
+
+maestro.empresa.local.
+
+Esto demuestra que el esclavo puede continuar atendiendo
+consultas DNS cuando el maestro no está disponible.
+
+
+10. HARDENING DEL SERVIDOR DNS
+------------------------------------------------------------
+Configuraciones aplicadas en el maestro:
+
+recursion no;
+
+allow-query { 192.168.50.0/24; localhost; };
+
+rate-limit {
+    responses-per-second 5;
+    window 5;
+    slip 2;
+};
+
+También se configuró el registro de consultas, transferencias
+y eventos de seguridad mediante archivos de log separados.
+
+
+============================================================
+FIN DE LAS PRUEBAS
+============================================================

@@ -1,0 +1,4 @@
+key "esclavo-transfer" {
+    algorithm hmac-sha256;
+    secret "6h7Y7SJsBtIO7tIPEiHaBIHYOkXHmQ7sRINZUh0YMas=";
+};

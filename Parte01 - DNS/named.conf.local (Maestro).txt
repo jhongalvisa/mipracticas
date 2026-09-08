@@ -1,0 +1,28 @@
+        file "/etc/bind/db.ale.com";
+};
+
+
+zone "servicios.com" {
+    type master;
+    file "/etc/bind/db.servicios.com";
+};
+
+
+zone "miotrositio.com" {
+    type master;
+    file "/etc/bind/db.miotrositio.com";
+};
+
+zone "empresa.local" {
+    type master;
+    file "/etc/bind/db.empresa.local";
+    notify yes;
+    also-notify { 192.168.50.2 key esclavo-transfer; };
+    allow-transfer { key esclavo-transfer; };
+    ixfr-from-differences yes;
+};
+
+zone "50.168.192.in-addr.arpa" {
+    type master;
+    file "/etc/bind/db.192.168.50";
+};

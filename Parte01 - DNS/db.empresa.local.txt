@@ -1,0 +1,28 @@
+$TTL 86400
+@       IN      SOA     ns1.empresa.local. admin.empresa.local. (
+                        2026090605
+                        3600
+                        900
+                        604800
+                        86400 )
+
+        IN      NS      ns1.empresa.local.
+        IN      NS      ns2.empresa.local.
+
+ns1     IN      A       192.168.50.3
+ns1     IN      AAAA    2001:db8::3
+
+ns2     IN      A       192.168.50.2
+ns2     IN      AAAA    2001:db8::2
+
+www     IN      A       192.168.50.3
+prueba  IN      A       192.168.50.3
+pruebaixfr    IN      A       192.168.50.3
+www     IN      AAAA    2001:db8::3
+
+mail    IN      A       192.168.50.3
+mail    IN      AAAA    2001:db8::3
+
+ftp     IN      CNAME   www.empresa.local.
+
+@       IN      MX      10 mail.empresa.local.
