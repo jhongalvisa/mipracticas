@@ -1,0 +1,97 @@
+# Comparativa de compresión: GZIP vs Brotli
+
+## Metodología
+
+Se realizaron pruebas sobre diferentes tipos de recursos servidos por
+Apache2. Se compararon diferentes niveles de compresión de GZIP y Brotli,
+midiendo el tamaño resultante y el tiempo de procesamiento.
+
+Los tamaños corresponden al contenido descargado después de la compresión.
+
+## Resultados de GZIP
+
+| Recurso | Original (B) | GZIP 1 (B) | GZIP 6 (B) | GZIP 9 (B) |
+|---|---:|---:|---:|---:|
+| HTML | 25056 | 298 | 174 | 174 |
+| CSS | 85 | 95 | 95 | 95 |
+| JavaScript | 109 | 118 | 118 | 118 |
+| JSON | 92 | 101 | 101 | 101 |
+| XML | 128 | 121 | 121 | 121 |
+| SVG | 132 | 135 | 135 | 135 |
+| TXT | 56001 | 451 | 251 | 251 |
+
+## Resultados de Brotli
+
+| Recurso | Original (B) | Brotli 5 (B) | Brotli 11 (B) |
+|---|---:|---:|---:|
+| HTML | 25056 | 84 | 74 |
+| CSS | 85 | 68 | 65 |
+| JavaScript | 109 | 109 | 109 |
+| JSON | 92 | 84 | 85 |
+| XML | 128 | 128 | 128 |
+| SVG | 132 | 108 | 114 |
+| TXT | 56001 | 65 | 64 |
+
+## Tiempo de procesamiento de Brotli
+
+Para el recurso HTML se realizaron 10 ejecuciones para comparar
+Brotli 5 y Brotli 11.
+
+| Configuración | Tiempo promedio |
+|---|---:|
+| Brotli 5 | 0.002069 s |
+| Brotli 11 | 0.004246 s |
+
+Brotli 11 obtuvo una reducción ligeramente mayor del tamaño, pero
+requirió aproximadamente el doble de tiempo de procesamiento que
+Brotli 5 en esta prueba.
+
+## Análisis
+
+### 1. Brotli vs GZIP
+
+Brotli obtuvo, en general, archivos comprimidos más pequeños que GZIP,
+especialmente en recursos HTML y texto. Sin embargo, en archivos muy
+pequeños las diferencias son reducidas e incluso algunos resultados
+pueden ser iguales o ligeramente mayores debido al overhead de la
+compresión.
+
+### 2. Rendimientos decrecientes
+
+En las pruebas realizadas, GZIP nivel 6 y nivel 9 produjeron los mismos
+tamaños para los recursos evaluados. Esto indica que aumentar el nivel
+de 6 a 9 no aportó una reducción adicional significativa.
+
+En Brotli se observó una situación similar: pasar de calidad 5 a 11
+produjo mejoras pequeñas en varios recursos, pero aumentó el tiempo
+de procesamiento.
+
+### 3. Archivos que no conviene comprimir
+
+Los archivos JPEG, PNG, MP4 y ZIP fueron excluidos de la compresión
+GZIP porque ya utilizan formatos de compresión. Volver a comprimirlos
+puede generar poco o ningún beneficio y consumir recursos de CPU.
+
+### 4. CPU frente a ancho de banda
+
+Los niveles de compresión más altos pueden reducir el tamaño transmitido,
+pero requieren más procesamiento. Por esta razón, utilizar niveles
+moderados permite obtener un equilibrio entre consumo de CPU y ahorro
+de ancho de banda.
+
+### 5. Recomendación
+
+Para un servidor web real se recomienda utilizar una configuración
+moderada. En este laboratorio se estableció GZIP en nivel 6 y Brotli
+en calidad 5, buscando un equilibrio entre reducción del tamaño y
+tiempo de procesamiento.
+
+Brotli puede utilizarse cuando el cliente lo soporte y GZIP como
+mecanismo compatible de respaldo.
+
+## Configuración utilizada
+
+GZIP:
+
+```apache
+DeflateCompressionLevel 6
