@@ -1,0 +1,136 @@
+============================================================
+PARTE 3 - TUNEL SEGURO Y ACCESO REMOTO
+COMANDOS Y PRUEBAS
+============================================================
+
+1. VERIFICACIÓN DEL SERVIDOR WEB
+------------------------------------------------------------
+Servidor: servidor (192.168.50.3)
+
+Comando:
+
+sudo systemctl status apache2 --no-pager
+
+Se verificó que Apache2 se encuentra activo.
+
+También se comprobó el acceso local mediante:
+
+curl -I http://localhost/
+
+Resultado esperado:
+
+HTTP/1.1 200 OK
+
+
+2. PÁGINA PERSONALIZADA
+------------------------------------------------------------
+Archivo utilizado:
+
+/var/www/html/pagina_personalizada.html
+
+La página contiene información personalizada del estudiante
+y datos del entorno utilizado en la práctica.
+
+Acceso local:
+
+http://192.168.50.3/pagina_personalizada.html
+
+
+3. CREACIÓN DEL TÚNEL CLOUDFLARE
+------------------------------------------------------------
+Se utilizó Cloudflare Quick Tunnel mediante:
+
+cloudflared tunnel --url http://localhost:80
+
+El túnel generó una URL pública HTTPS con dominio:
+
+trycloudflare.com
+
+La URL generada durante la prueba fue:
+
+https://tire-affiliates-alcohol-constitutes.trycloudflare.com
+
+El túnel permaneció activo mientras se realizaron las pruebas.
+
+
+4. ACCESO A LA PÁGINA MEDIANTE EL TÚNEL
+------------------------------------------------------------
+Página utilizada:
+
+https://tire-affiliates-alcohol-constitutes.trycloudflare.com/pagina_personalizada.html
+
+Se comprobó que la página personalizada era accesible
+mediante HTTPS a través del túnel.
+
+
+5. PRUEBA DE ACCESO REMOTO
+------------------------------------------------------------
+Se accedió a la URL pública desde un teléfono utilizando
+datos móviles, sin conexión a la red Wi-Fi local.
+
+Resultado:
+
+La página personalizada cargó correctamente.
+
+Esto demuestra que el servicio puede ser accedido desde
+una red externa mediante el túnel.
+
+
+6. VERIFICACIÓN DE COMPRESIÓN A TRAVÉS DEL TÚNEL
+------------------------------------------------------------
+Desde Windows se ejecutó:
+
+curl.exe -I -H "Accept-Encoding: gzip" "https://tire-affiliates-alcohol-constitutes.trycloudflare.com/pagina_personalizada.html"
+
+Resultado:
+
+HTTP/1.1 200 OK
+Content-Type: text/html
+Server: cloudflare
+Vary: Accept-Encoding
+Content-Encoding: gzip
+
+La presencia de:
+
+Content-Encoding: gzip
+
+demuestra que la respuesta fue entregada utilizando
+compresión GZIP.
+
+
+7. CIERRE DEL TÚNEL
+------------------------------------------------------------
+Para detener el Quick Tunnel se utiliza:
+
+Ctrl + C
+
+El cierre del proceso termina el acceso público mediante
+la URL temporal.
+
+
+8. CONSIDERACIONES DE SEGURIDAD
+------------------------------------------------------------
+Mientras el túnel está activo, el servicio web queda
+accesible públicamente desde Internet.
+
+Riesgos identificados:
+
+- Aumento de la superficie de exposición.
+- Ausencia de autenticación en la página de prueba.
+- Posibilidad de acceso por cualquier persona que conozca
+  la URL.
+- Limitaciones propias de un Quick Tunnel gratuito.
+
+Mitigaciones propuestas:
+
+- Implementar autenticación y control de acceso para
+  servicios reales.
+- Restringir el acceso a usuarios o redes autorizadas.
+- No publicar información sensible.
+- Mantener actualizado el servidor.
+- Cerrar el túnel cuando termine la prueba.
+
+
+============================================================
+FIN DE LAS PRUEBAS
+============================================================

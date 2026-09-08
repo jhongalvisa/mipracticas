@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Parcial Servicios Telemáticos</title>
+</head>
+<body>
+    <h1>Parcial de Servicios Telemáticos</h1>
+
+    <h2>Servidor Web mediante Túnel Seguro</h2>
+
+    <p><strong>Nombre:</strong> Jhon Alexander Galvis</p>
+    <p><strong>Código:</strong> 2235593</p>
+    <p><strong>Fecha:</strong> 8 de septiembre de 2026</p>
+    <p><strong>Identificador:</strong> PARCIAL-2026-TELEMATICA</p>
+
+    <hr>
+
+    <p><strong>Servidor:</strong> Apache2</p>
+    <p><strong>Plataforma:</strong> Ubuntu 22.04 + Vagrant + VirtualBox</p>
+    <p><strong>Red local:</strong> 192.168.50.0/24</p>
+</body>
+</html>
